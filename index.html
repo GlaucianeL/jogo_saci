@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html>   
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
@@ -16,7 +16,7 @@
       width: 100vw;
       height: 100vh;
       background: url('fundo2.png') repeat-x bottom;
-      background-size: auto 100%;
+      background-size: contain;
       background-color: #87CEEB;
       animation: moverFundo 60s linear infinite;
     }
@@ -27,7 +27,7 @@
 
     #saci {
       position: absolute;
-      bottom: 0;
+      bottom: 4vh;
       left: 5vw;
       width: 12vw;
       max-width: 80px;
@@ -36,7 +36,7 @@
 
     #pedra {
       position: absolute;
-      bottom: 0;
+      bottom: 4vh;
       right: -20vw;
       width: 8vw;
       max-width: 50px;
@@ -52,15 +52,15 @@
     }
 
     @keyframes jump {
-      0% { bottom: 0; }
-      50% { bottom: 15vh; }
-      100% { bottom: 0; }
+      0% { bottom: 4vh; }
+      50% { bottom: 20vh; }
+      100% { bottom: 4vh; }
     }
 
     @keyframes jump-longo {
-      0% { bottom: 0; }
-      50% { bottom: 20vh; }
-      100% { bottom: 0; }
+      0% { bottom: 4vh; }
+      50% { bottom: 28vh; }
+      100% { bottom: 4vh; }
     }
 
     @keyframes moverFundo {
@@ -73,7 +73,7 @@
       top: 40%;
       width: 100%;
       text-align: center;
-      font-size: 48px;
+      font-size: 6vw;
       color: yellow;
       font-weight: bold;
       text-shadow: 2px 2px 5px black;
@@ -83,35 +83,33 @@
 
     #placar {
       position: absolute;
-      top: 20px;
-      left: 20px;
-      font-size: 32px;
+      top: 2vh;
+      left: 4vw;
+      font-size: 5vw;
       color: white;
       font-weight: bold;
       text-shadow: 1px 1px 3px black;
       z-index: 10;
     }
 
-    /* Ajustes para dispositivos móveis */
     @media (max-width: 600px) {
-      #placar {
-        font-size: 20px;
-        top: 10px;
-        left: 10px;
-      }
-
-      #mensagem-fim {
-        font-size: 28px;
-        top: 30%;
-      }
-
       #saci {
         width: 60px;
         left: 30px;
+        bottom: 4vh;
       }
 
       #pedra {
         width: 40px;
+        bottom: 4vh;
+      }
+
+      #placar {
+        font-size: 18px;
+      }
+
+      #mensagem-fim {
+        font-size: 24px;
       }
     }
   </style>
@@ -176,7 +174,7 @@
         const saciBottom = parseInt(window.getComputedStyle(saci).bottom);
         const pedraRight = pedraLeft + pedra.offsetWidth;
 
-        if (pedraLeft < 130 && pedraRight > 50 && saciBottom < 50) {
+        if (pedraLeft < 130 && pedraRight > 50 && saciBottom < 70) {
           clearInterval(interval);
           somColisao.play();
           mensagemFim.style.display = "block";
@@ -203,3 +201,4 @@
   </script>
 </body>
 </html>
+
