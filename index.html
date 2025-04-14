@@ -1,0 +1,178 @@
+<!DOCTYPE html>  
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Jogo do Saci</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+
+    #game {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: url('fundo2.png') repeat-x bottom;
+      background-size: contain;
+      background-color: #87CEEB;
+      animation: moverFundo 60s linear infinite;
+    }
+
+    #game.pausado {
+      animation-play-state: paused;
+    }
+
+    #saci {
+      position: absolute;
+      bottom: 0;
+      left: 50px;
+      width: 80px;
+    }
+
+    #pedra {
+      position: absolute;
+      bottom: 0;
+      right: -100px;
+      width: 50px;
+    }
+
+    .jump {
+      animation: jump 0.5s ease;
+    }
+
+    .jump-longo {
+      animation: jump-longo 0.8s ease;
+    }
+
+    @keyframes jump {
+      0% { bottom: 0; }
+      50% { bottom: 150px; }
+      100% { bottom: 0; }
+    }
+
+    @keyframes jump-longo {
+      0% { bottom: 0; }
+      50% { bottom: 200px; }
+      100% { bottom: 0; }
+    }
+
+    @keyframes moverFundo {
+      from { background-position: 0 0; }
+      to { background-position: -10000px 0; }
+    }
+
+    #mensagem-fim {
+      position: absolute;
+      top: 40%;
+      width: 100%;
+      text-align: center;
+      font-size: 48px;
+      color: yellow;
+      font-weight: bold;
+      text-shadow: 2px 2px 5px black;
+      display: none;
+      z-index: 10;
+    }
+
+    #placar {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 32px;
+      color: white;
+      font-weight: bold;
+      text-shadow: 1px 1px 3px black;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="game">
+    <div id="placar">Pontuação: 0</div>
+    <div id="mensagem-fim">💥 O Saci bateu na pedra! Fim de jogo.</div>
+    <img id="saci" src="saci.png" alt="Saci">
+    <img id="pedra" src="pedra1.webp" alt="Pedra">
+  </div>
+
+  <!-- Sons -->
+  <audio id="somPulo" src="pulo.mp3" preload="auto"></audio>
+  <audio id="somColisao" src="colisao.mp3" preload="auto"></audio>
+
+  <script>
+    const saci = document.getElementById("saci");
+    const pedra = document.getElementById("pedra");
+    const mensagemFim = document.getElementById("mensagem-fim");
+    const placar = document.getElementById("placar");
+    const game = document.getElementById("game");
+
+    const somPulo = document.getElementById("somPulo");
+    const somColisao = document.getElementById("somColisao");
+
+    let pontuacao = 0;
+    let velocidade = 10;
+
+    function atualizarPlacar() {
+      placar.innerText = "Pontuação: " + pontuacao;
+    }
+
+    function pular(tipo = "curto") {
+      if (!saci.classList.contains("jump") && !saci.classList.contains("jump-longo")) {
+        saci.classList.add(tipo === "longo" ? "jump-longo" : "jump");
+        somPulo.currentTime = 0;
+        somPulo.play();
+        setTimeout(() => {
+          saci.classList.remove(tipo === "longo" ? "jump-longo" : "jump");
+        }, tipo === "longo" ? 800 : 500);
+      }
+    }
+
+    document.addEventListener("keydown", function(event) {
+      if (event.code === "Space") {
+        pular("curto");
+      }
+    });
+
+    document.addEventListener("click", () => pular("longo"));
+    document.addEventListener("touchstart", () => pular("longo"));
+
+    function movePedra() {
+      let pedraLeft = window.innerWidth;
+      pedra.style.left = pedraLeft + "px";
+
+      const interval = setInterval(() => {
+        pedraLeft -= velocidade;
+        pedra.style.left = pedraLeft + "px";
+
+        const saciBottom = parseInt(window.getComputedStyle(saci).bottom);
+        const pedraRight = pedraLeft + pedra.offsetWidth;
+
+        if (pedraLeft < 130 && pedraRight > 50 && saciBottom < 50) {
+          clearInterval(interval);
+          somColisao.play();
+          mensagemFim.style.display = "block";
+          game.classList.add("pausado");
+          setTimeout(() => location.reload(), 3000);
+        }
+
+        if (pedraLeft < -100) {
+          clearInterval(interval);
+          pontuacao++;
+          atualizarPlacar();
+
+          if (pontuacao % 10 === 0) {
+            velocidade += 1; // aumenta gradualmente a velocidade
+          }
+
+          setTimeout(movePedra, 500 + Math.random() * 1000);
+        }
+      }, 30);
+    }
+
+    atualizarPlacar();
+    movePedra();
+  </script>
+</body>
+</html>
