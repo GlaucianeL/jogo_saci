@@ -1,4 +1,4 @@
-<!DOCTYPE html>  
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
@@ -16,7 +16,7 @@
       width: 100vw;
       height: 100vh;
       background: url('fundo2.png') repeat-x bottom;
-      background-size: contain;
+      background-size: auto 100%;
       background-color: #87CEEB;
       animation: moverFundo 60s linear infinite;
     }
@@ -28,15 +28,19 @@
     #saci {
       position: absolute;
       bottom: 0;
-      left: 50px;
-      width: 80px;
+      left: 5vw;
+      width: 12vw;
+      max-width: 80px;
+      height: auto;
     }
 
     #pedra {
       position: absolute;
       bottom: 0;
-      right: -100px;
-      width: 50px;
+      right: -20vw;
+      width: 8vw;
+      max-width: 50px;
+      height: auto;
     }
 
     .jump {
@@ -49,13 +53,13 @@
 
     @keyframes jump {
       0% { bottom: 0; }
-      50% { bottom: 150px; }
+      50% { bottom: 15vh; }
       100% { bottom: 0; }
     }
 
     @keyframes jump-longo {
       0% { bottom: 0; }
-      50% { bottom: 200px; }
+      50% { bottom: 20vh; }
       100% { bottom: 0; }
     }
 
@@ -86,6 +90,29 @@
       font-weight: bold;
       text-shadow: 1px 1px 3px black;
       z-index: 10;
+    }
+
+    /* Ajustes para dispositivos móveis */
+    @media (max-width: 600px) {
+      #placar {
+        font-size: 20px;
+        top: 10px;
+        left: 10px;
+      }
+
+      #mensagem-fim {
+        font-size: 28px;
+        top: 30%;
+      }
+
+      #saci {
+        width: 60px;
+        left: 30px;
+      }
+
+      #pedra {
+        width: 40px;
+      }
     }
   </style>
 </head>
@@ -163,7 +190,7 @@
           atualizarPlacar();
 
           if (pontuacao % 10 === 0) {
-            velocidade += 1; // aumenta gradualmente a velocidade
+            velocidade += 1;
           }
 
           setTimeout(movePedra, 500 + Math.random() * 1000);
