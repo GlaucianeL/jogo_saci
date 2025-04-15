@@ -9,6 +9,7 @@
       margin: 0;
       overflow: hidden;
       touch-action: manipulation;
+      user-select: none; /* Previne seleção de texto */
     }
 
     #game {
@@ -18,7 +19,7 @@
       max-height: 100vh;
       background: url('fundo2.png') repeat-x bottom;
       background-size: cover;
-      background-position: c;
+      background-position: center; /* Correção do valor */
       background-color: #87CEEB;
       animation: moverFundo 60s linear infinite;
     }
@@ -37,8 +38,8 @@
     #pedra {
       position: absolute;
       bottom: 0;
-      right: -100px;
       width: 50px;
+      right: -100px; /* Alterado para controle via JS */
     }
 
     .jump {
@@ -89,10 +90,12 @@
       text-shadow: 1px 1px 3px black;
       z-index: 10;
     }
+
     @media(min-width: 768px) {
       #game {
         background-size: contain;
-    }
+      }
+    } /* Correção do fechamento da media query */
   </style>
 </head>
 <body>
@@ -119,13 +122,14 @@
 
     let pontuacao = 0;
     let velocidade = 10;
+    let jogoAtivo = true;
 
     function atualizarPlacar() {
       placar.innerText = "Pontuação: " + pontuacao;
     }
 
     function pular(tipo = "curto") {
-      if (!saci.classList.contains("jump") && !saci.classList.contains("jump-longo")) {
+      if (!saci.classList.contains("jump") && !saci.classList.contains("jump-longo") && jogoAtivo) {
         saci.classList.add(tipo === "longo" ? "jump-longo" : "jump");
         somPulo.currentTime = 0;
         somPulo.play();
@@ -135,41 +139,67 @@
       }
     }
 
+    // Event listeners
     document.addEventListener("keydown", function(event) {
       if (event.code === "Space") {
+        event.preventDefault();
         pular("curto");
       }
     });
 
-    document.addEventListener("click", () => pular("longo"));
-    document.addEventListener("touchstart", () => pular("longo"));
+    document.addEventListener("click", (e) => {
+      e.preventDefault();
+      pular("longo");
+    });
+
+    document.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      pular("longo");
+    }, { passive: false });
+
+    function verificarColisao() {
+      const saciRect = saci.getBoundingClientRect();
+      const pedraRect = pedra.getBoundingClientRect();
+
+      return !(
+        pedraRect.right < saciRect.left ||
+        pedraRect.left > saciRect.right ||
+        pedraRect.bottom < saciRect.top ||
+        pedraRect.top > saciRect.bottom
+      );
+    }
 
     function movePedra() {
-      let pedraLeft = window.innerWidth;
-      pedra.style.left = pedraLeft + "px";
+      if (!jogoAtivo) return;
+
+      let pedraPos = -100;
+      pedra.style.right = pedraPos + "px";
 
       const interval = setInterval(() => {
-        pedraLeft -= velocidade;
-        pedra.style.left = pedraLeft + "px";
-
-        const saciBottom = parseInt(window.getComputedStyle(saci).bottom);
-        const pedraRight = pedraLeft + pedra.offsetWidth;
-
-        if (pedraLeft < 130 && pedraRight > 50 && saciBottom < 50) {
+        if (!jogoAtivo) {
           clearInterval(interval);
+          return;
+        }
+
+        pedraPos += velocidade;
+        pedra.style.right = pedraPos + "px";
+
+        if (verificarColisao()) {
+          clearInterval(interval);
+          jogoAtivo = false;
           somColisao.play();
           mensagemFim.style.display = "block";
           game.classList.add("pausado");
           setTimeout(() => location.reload(), 3000);
         }
 
-        if (pedraLeft < -100) {
+        if (pedraPos > window.innerWidth + 100) {
           clearInterval(interval);
           pontuacao++;
           atualizarPlacar();
 
           if (pontuacao % 10 === 0) {
-            velocidade += 1; // aumenta gradualmente a velocidade
+            velocidade += 1;
           }
 
           setTimeout(movePedra, 500 + Math.random() * 1000);
