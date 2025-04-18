@@ -9,7 +9,7 @@
       margin: 0;
       overflow: hidden;
       touch-action: manipulation;
-      user-select: none; /* Previne seleção de texto */
+      user-select: none;
     }
 
     #game {
@@ -19,7 +19,7 @@
       max-height: 100vh;
       background: url('fundo2.png') repeat-x bottom;
       background-size: cover;
-      background-position: center; /* Correção do valor */
+      background-position: center;
       background-color: #87CEEB;
       animation: moverFundo 60s linear infinite;
     }
@@ -39,7 +39,7 @@
       position: absolute;
       bottom: 0;
       width: 50px;
-      right: -100px; /* Alterado para controle via JS */
+      right: -100px;
     }
 
     .jump {
@@ -91,15 +91,32 @@
       z-index: 10;
     }
 
+    #botao-iniciar {
+      position: absolute;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 32px;
+      padding: 15px 30px;
+      background-color: green;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 11;
+      box-shadow: 2px 2px 8px black;
+    }
+
     @media(min-width: 768px) {
       #game {
         background-size: contain;
       }
-    } /* Correção do fechamento da media query */
+    }
   </style>
 </head>
 <body>
   <div id="game">
+    <button id="botao-iniciar">Iniciar Jogo</button>
     <div id="placar">Pontuação: 0</div>
     <div id="mensagem-fim">💥 O Saci bateu na pedra! Fim de jogo.</div>
     <img id="saci" src="saci.png" alt="Saci">
@@ -116,13 +133,14 @@
     const mensagemFim = document.getElementById("mensagem-fim");
     const placar = document.getElementById("placar");
     const game = document.getElementById("game");
+    const botaoIniciar = document.getElementById("botao-iniciar");
 
     const somPulo = document.getElementById("somPulo");
     const somColisao = document.getElementById("somColisao");
 
     let pontuacao = 0;
     let velocidade = 10;
-    let jogoAtivo = true;
+    let jogoAtivo = false;
 
     function atualizarPlacar() {
       placar.innerText = "Pontuação: " + pontuacao;
@@ -139,7 +157,6 @@
       }
     }
 
-    // Event listeners
     document.addEventListener("keydown", function(event) {
       if (event.code === "Space") {
         event.preventDefault();
@@ -148,13 +165,17 @@
     });
 
     document.addEventListener("click", (e) => {
-      e.preventDefault();
-      pular("longo");
+      if (jogoAtivo) {
+        e.preventDefault();
+        pular("longo");
+      }
     });
 
     document.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      pular("longo");
+      if (jogoAtivo) {
+        e.preventDefault();
+        pular("longo");
+      }
     }, { passive: false });
 
     function verificarColisao() {
@@ -207,8 +228,17 @@
       }, 30);
     }
 
-    atualizarPlacar();
-    movePedra();
+    botaoIniciar.addEventListener("click", () => {
+      botaoIniciar.style.display = "none";
+      jogoAtivo = true;
+      atualizarPlacar();
+
+      // Delay inicial antes da pedra aparecer
+      setTimeout(() => {
+        movePedra();
+      }, 2000); // 2 segundos de espera
+    });
   </script>
 </body>
 </html>
+
